@@ -16,9 +16,11 @@ class ProductsController extends Controller
 
     public static function list()
     {
-        $products = Products::where('user_id', auth()->user()->id)->get();
+        $perPage = 2;
+        $products = Products::where('user_id', auth()->user()->id)->paginate($perPage);
         return response()->json([
             'success' => 1,
+            'current_page' => $products->currentPage(),
             'html' => view('products.list', ['products' => $products])->render()
         ]);
     }
@@ -44,11 +46,15 @@ class ProductsController extends Controller
         $validator = Validator::make($data, $rules);
 
         if($validator->fails()){
+            info('fails');
+            info($data);
             return response()->json([
                 'success' => 0,
                 'messages' => $validator->errors(),
             ]);
         }else{
+            info('success');
+            info($data);
             DB::table('products')->insert($data);
             $products = Products::where('user_id', auth()->user()->id)->get();
 

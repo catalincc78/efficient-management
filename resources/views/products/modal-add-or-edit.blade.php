@@ -31,37 +31,3 @@
     </div>
 </div>
 @endsection
-@section('scripts')
-    @parent
-    <script type="module">
-        $(document).ready(function() {
-            $('#product-add-or-edit .btn-primary').on('click', function(){
-                let data = $('#product-add-or-edit form').serialize();
-                $.ajax({
-                    type: "POST",
-                    url: "{{ route('product.add') }}",
-                    data: data,
-                    dataType: "json",
-                    success: function(response) {
-                        if(response.success === 1){
-                            console.log('safa');
-                            loadProductList(response.html);
-                            console.log('safa2');
-                            showNotification('.products-list-notifications', response.messages);
-                            $('#product-add-or-edit .btn-close').click();
-                            console.log('safa3');
-                        }else{
-                            console.log(response.messages);
-                            $('#product-add-or-edit .form-control').removeClass('is-invalid');
-                            for(let fieldName in response.messages){
-                                $('#product-add-or-edit input[name="'+ fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
-                                $('#product-add-or-edit .form-control').addClass('is-invalid');
-                            }
-                        }
-
-                    }
-                });
-            })
-        });
-    </script>
-@endsection
