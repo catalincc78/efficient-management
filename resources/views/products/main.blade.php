@@ -23,10 +23,11 @@
         </div>
     </div>
 @endsection
+@include('products.modal-add-or-edit')
 @section('scripts')
     @parent
     <script type="module">
-        function loadProductList(html = undefined) {
+        var loadProductList = function(html = undefined) {
             if(html !== undefined){
                 $('.products-list').html(html);
                 return false;
@@ -45,8 +46,6 @@
         $(document).ready(function() {
             loadProductList();
         });
+        window.loadProductList = loadProductList;
     </script>
-@endsection
-@section('modals')
-    @include('products.modal-add-or-edit')
 @endsection
