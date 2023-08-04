@@ -11,7 +11,6 @@ class Helper
     {
         $perPage = 2;
         $products =  Products::where('user_id', auth()->user()->id)->paginate($perPage);
-        info($products->lastPage() . ' vs ' . $products->currentPage());
         if($products->lastPage() < $products->currentPage()){
             Paginator::currentPageResolver(function() use($products){ return $products->lastPage();});
             $products =  Products::where('user_id', auth()->user()->id)->paginate($perPage);
