@@ -1,6 +1,6 @@
 @section('modals')
 @parent
-<div class="modal fade" id="product-add-or-edit" tabindex="-1" aria-labelledby="product-add-or-edit-title" aria-hidden="true">
+<div class="modal fade" id="modal-product-add-or-edit" tabindex="-1" aria-labelledby="product-add-or-edit-title" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">

@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>{{ __('Products') }}</span>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#product-add-or-edit">{{ __('Add') }}</button>
+                        <button type="button" class="btn btn-primary btn-product-add">{{ __('Add') }}</button>
                     </div>
 
                     <div class="card-body">
@@ -24,9 +24,11 @@
     </div>
 @endsection
 @include('products.modal-add-or-edit')
+@include('products.modal-delete')
 @section('scripts')
     @parent
     <script type="module">
+
         var nProductsCurrentPage = 1;
         var loadProductList = function(html = undefined) {
             if(html !== undefined){
@@ -57,29 +59,86 @@
             }
         });
 
-        $(document).on('click', '#product-add-or-edit .btn-primary', function(){
-            let data = $('#product-add-or-edit form').serialize();
 
-            console.log('afsfasg');
+        $(document).on('click', '.btn-product-add, .btn-product-edit', function(evt){
+            let modalSelector = $('#modal-product-add-or-edit');
+            let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
+            let btn = $(evt.currentTarget);
+
+            modalSelector.find('.form-control').removeClass('is-invalid'); // removing previous errors before loading modal
+            modalSelector.find('form')[0].reset();
+            if(btn.hasClass('btn-product-edit')){
+                let nId = btn.closest('tr').attr('data-id');
+                $.ajax({
+                    type: "GET",
+                    url: "product/" + nId,
+                    dataType: "json",
+                    success: function(response) {
+                        if(response.success === 1){
+                            modalSelector.find('[name="id"]').val(response.product.id);
+                            modalSelector.find('[name="name"]').val(response.product.name);
+                            modalSelector.find('[name="sku"]').val(response.product.sku);
+                            modal.show();
+                        }
+                    }
+                });
+            }else{
+                modalSelector.find('[name="id"]').val('');
+                modal.show();
+            }
+        });
+
+        $(document).on('click', '.btn-product-delete', function(evt){
+            let modalSelector = $('#modal-product-delete');
+            let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
+            let btn = $(evt.currentTarget);
+            let nId = btn.closest('tr').attr('data-id');
+            modalSelector.find('[name="id"]').val(nId);
+            modal.show();
+        });
+
+        $(document).on('click', '#modal-product-delete .btn-danger', function(evt) {
+            let modalSelector = $('#modal-product-delete');
+            let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
+            let nId = modalSelector.find('[name="id"]').val();
+            let data = modalSelector.find('form').serialize();
+            data += '&page=' + nProductsCurrentPage;
+
             $.ajax({
-                type: "POST",
-                url: "{{ route('product.add') }}",
+                type: "DELETE",
+                url: "product/" + nId,
                 data: data,
                 dataType: "json",
                 success: function(response) {
                     if(response.success === 1){
-                        console.log('safa');
                         loadProductList(response.html);
-                        console.log('safa2');
                         showNotification('.products-list-notifications', response.messages);
-                        $('#product-add-or-edit .btn-close').click();
-                        console.log('safa3');
+                        modal.hide();
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '#modal-product-add-or-edit .btn-primary', function(){
+            let data = $('#modal-product-add-or-edit form').serialize();
+            data += '&page=' + nProductsCurrentPage;
+            let nId = $('#modal-product-add-or-edit form [name="id"]').val();
+            $.ajax({
+                type: nId ? "PUT" : "POST",
+                url: nId ? "product/" + nId : "{{ route('product.add') }}",
+                data: data,
+                dataType: "json",
+                success: function(response) {
+                    if(response.success === 1){
+                        loadProductList(response.html);
+                        showNotification('.products-list-notifications', response.messages);
+                        $('#modal-product-add-or-edit .btn-close').click();
                     }else{
                         console.log(response.messages);
-                        $('#product-add-or-edit .form-control').removeClass('is-invalid');
+                        $('#modal-product-add-or-edit .form-control').removeClass('is-invalid');
                         for(let fieldName in response.messages){
-                            $('#product-add-or-edit input[name="'+ fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
-                            $('#product-add-or-edit .form-control').addClass('is-invalid');
+                            $('#modal-product-add-or-edit input[name="'+ fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
+                            $('#modal-product-add-or-edit .form-control').addClass('is-invalid');
                         }
                     }
                 }
@@ -102,25 +161,6 @@
         }
         .products-list nav p{
             margin-bottom: 0;
-        }
-        @media screen and ( max-width: 1024px ){
-
-            li.page-item {
-
-                display: none;
-            }
-
-            .page-item:first-child,
-            .page-item:nth-child( 2 ),
-            .page-item:nth-child( 3 ),
-            .page-item:nth-last-child( 2 ),
-            .page-item:nth-last-child( 3 ),
-            .page-item:last-child,
-            .page-item.active,
-            .page-item.disabled {
-
-                display: block;
-            }
         }
     </style>
 @endsection

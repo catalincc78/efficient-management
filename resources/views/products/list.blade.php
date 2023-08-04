@@ -9,16 +9,16 @@
     </thead>
     <tbody>
     @foreach($products as $product)
-        <tr>
+        <tr data-id="{{$product->id}}">
             <td >{{$product->name}}</td>
             <td class="text-start">{{$product->sku}}</td>
             <td class="text-end">{{$product->stock}}</td>
             <td class="text-end">
-                <button type="button" class="btn btn-primary"><i class="fa-solid fa-pencil"></i></button>
-                <button type="button" class="btn btn-danger"><i class="fa-regular fa-trash-can"></i></button>
+                <button type="button" class="btn btn-primary btn-product-edit"><i class="fa-solid fa-pencil"></i></button>
+                <button type="button" class="btn btn-danger btn-product-delete"><i class="fa-regular fa-trash-can"></i></button>
             </td>
         </tr>
     @endforeach
     </tbody>
 </table>
-{!! $products->links()!!}
+{!! $products->onEachSide(1)->links() !!}

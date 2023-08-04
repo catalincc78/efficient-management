@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helper;
 use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +17,7 @@ class ProductsController extends Controller
 
     public static function list()
     {
-        $perPage = 2;
-        $products = Products::where('user_id', auth()->user()->id)->paginate($perPage);
+        $products = Helper::getPaginatedProducts();
         return response()->json([
             'success' => 1,
             'current_page' => $products->currentPage(),
@@ -27,11 +27,13 @@ class ProductsController extends Controller
 
     public static function get($id)
     {
-        info('get'.$id);
+        return response()->json([
+            'success' => 1,
+            'product' => Products::find($id)
+        ]);
     }
-    public static function add()
+    private static function saveProduct($id = 0)
     {
-        info('add');
         $data = [
             'user_id' => auth()->user()->id,
             'name' => request()->name,
@@ -46,34 +48,43 @@ class ProductsController extends Controller
         $validator = Validator::make($data, $rules);
 
         if($validator->fails()){
-            info('fails');
-            info($data);
             return response()->json([
                 'success' => 0,
                 'messages' => $validator->errors(),
             ]);
         }else{
-            info('success');
-            info($data);
-            DB::table('products')->insert($data);
-            $products = Products::where('user_id', auth()->user()->id)->get();
-
+            if(!empty($id)){
+                DB::table('products')->where('id' , $id)->update($data);
+            }else{
+                DB::table('products')->insert($data);
+            }
+            $products = Helper::getPaginatedProducts();
             return response()->json([
                 'success' => 1,
-                'messages' => ['Product created successfully!'],
+                'messages' => ['Product ' . (empty($id) ? 'created' : 'updated') . ' successfully!'],
                 'html' => view('products.list', ['products' => $products])->render()
             ]);
         }
 
     }
+    public static function add()
+    {
+        return self::saveProduct();
+    }
 
     public static function edit($id)
     {
-        info('edit'.$id);
+        return self::saveProduct($id);
     }
 
     public static function delete($id)
     {
-        info('delete'.$id);
+        Products::where('id', $id)->delete();
+        $products = Helper::getPaginatedProducts();
+        return response()->json([
+            'success' => 1,
+            'messages' => ['Product has been deleted successfully!'],
+            'html' => view('products.list', ['products' => $products])->render()
+        ]);
     }
 }
