@@ -104,6 +104,10 @@
             let item = $(evt.currentTarget).closest('.transacted-item-row');
             item.toggleClass('transacted-item-type-activity');
             item.toggleClass('transacted-item-type-product');
+
+            let icon = item.hasClass('transacted-item-type-activity') ? 'fa-boxes-stacked' : 'fa-box';
+            $(evt.currentTarget).find('i').removeClass().addClass('fa-solid ' + icon);
+
         });
 
         $(document).on('click', '#modal-transaction-add-or-edit .btn-save', function(){

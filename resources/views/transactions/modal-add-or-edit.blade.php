@@ -1,6 +1,6 @@
 @section('modals')
     @parent
-    <div class="modal fade modal-xl" id="modal-transaction-add-or-edit" tabindex="-1" aria-labelledby="transaction-add-or-edit-title" aria-hidden="true">
+    <div class="modal fade modal-lg" id="modal-transaction-add-or-edit" tabindex="-1" aria-labelledby="transaction-add-or-edit-title" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
