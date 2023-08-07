@@ -29,7 +29,6 @@
 @section('scripts')
     @parent
     <script type="module">
-
         var nTransactionsCurrentPage = 1;
         var loadTransactionList = function(html = undefined) {
             if(html !== undefined){
@@ -68,6 +67,7 @@
 
             modalSelector.find('.form-control').removeClass('is-invalid'); // removing previous errors before loading modal
             modalSelector.find('form')[0].reset();
+            modalSelector.find('.mtae-transacted-items-container').html('');
             if(btn.hasClass('btn-transaction-edit')){
                 let nId = btn.closest('tr').attr('data-id');
                 $.ajax({
@@ -95,41 +95,50 @@
             let itemPlaceholder = modalSelector.find('.placeholder-item');
             let itemPlaceholderClone = itemPlaceholder.clone();
             itemPlaceholderClone.removeClass('placeholder-item');
-
             itemsContainer.append(itemPlaceholderClone);
         });
 
         $(document).on('click', '#modal-transaction-add-or-edit .btn-transacted-item-toggle-type', function(evt) {
-            let modalSelector = $('#modal-transaction-add-or-edit');
             let item = $(evt.currentTarget).closest('.transacted-item-row');
-            item.toggleClass('transacted-item-type-activity');
-            item.toggleClass('transacted-item-type-product');
+            item.toggleClass('transacted-item-type-activity').toggleClass('transacted-item-type-product');
+            item.find('[name="target_type[]"]').val(item.hasClass('transacted-item-type-activity' ) ? 'activity' : 'product') ;
+        });
 
-            let icon = item.hasClass('transacted-item-type-activity') ? 'fa-boxes-stacked' : 'fa-box';
-            $(evt.currentTarget).find('i').removeClass().addClass('fa-solid ' + icon);
+        $(document).on('click', '#modal-transaction-add-or-edit .btn-transacted-item-toggle-amount-sign', function(evt) {
+            let item = $(evt.currentTarget).closest('.transacted-item-row');
+            item.toggleClass('transacted-item-amount-positive').toggleClass('transacted-item-amount-negative');
+            item.find('[name="is_amount_positive[]"]').val(item.hasClass('transacted-item-amount-positive' ) ? 1 : 0) ;
+        });
 
+        $(document).on('click', '#modal-transaction-add-or-edit .btn-transacted-item-delete', function(evt) {
+            let item = $(evt.currentTarget).closest('.transacted-item-row');
+            item.remove();
         });
 
         $(document).on('click', '#modal-transaction-add-or-edit .btn-save', function(){
             let data = $('#modal-transaction-add-or-edit form').serialize();
             data += '&page=' + nTransactionsCurrentPage;
             let nId = $('#modal-transaction-add-or-edit form [name="id"]').val();
+            console.log('before ajax');
             $.ajax({
                 type: nId ? "PUT" : "POST",
                 url: nId ? "transaction/" + nId : "{{ route('transaction.add') }}",
                 data: data,
                 dataType: "json",
                 success: function(response) {
+                    console.log(response);
                     if(response.success === 1){
                         loadTransactionList(response.html);
                         showNotification('.transactions-list-notifications', response.messages);
                         $('#modal-transaction-add-or-edit .btn-close').click();
                     }else{
-                        console.log(response.messages);
+                        if(response.messages.general !== undefined) {
+                            showNotification('.transaction-add-or-edit-notification', [response.messages.general], 'danger');
+                        }
                         $('#modal-transaction-add-or-edit .form-control').removeClass('is-invalid');
                         for(let fieldName in response.messages){
-                            $('#modal-transaction-add-or-edit input[name="'+ fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
-                            $('#modal-transaction-add-or-edit .form-control').addClass('is-invalid');
+                            let arName = fieldName.split('.');
+                            $($('#modal-transaction-add-or-edit [name="'+ arName[0] + '[]"]')[arName[1]]).addClass('is-invalid').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
                         }
                     }
                 }

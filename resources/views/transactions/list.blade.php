@@ -12,9 +12,9 @@
             <td >{{$transaction->name}}</td>
             <td class="text-end">{{$transaction->stock}}</td>
             <td class="text-end">
+                <button type="button" class="btn btn-info btn-transaction-details"><i class="fa-solid fa-list-ol"></i></button>
                 <button type="button" class="btn btn-primary btn-transaction-edit"><i class="fa-solid fa-pencil"></i></button>
                 <button type="button" class="btn btn-danger btn-transaction-delete"><i class="fa-regular fa-trash-can"></i></button>
-                <button type="button" class="btn btn-info btn-transaction-details"><i class="bi bi-list-ol"></i></button>
             </td>
         </tr>
     @endforeach

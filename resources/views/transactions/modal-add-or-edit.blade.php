@@ -8,7 +8,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
+                    <div class="transaction-add-or-edit-notification"></div>
                     <form>
                         @csrf
                         <input type="hidden" name="id">
@@ -29,17 +29,4 @@
             </div>
         </div>
     </div>
-@endsection
-
-@section('styles')
-    <style>
-        .transacted-item-type-activity .transacted-item-product,
-        .transacted-item-type-activity .transacted-item-quantity,
-        .transacted-item-type-activity .transacted-item-add-new-product{
-            display:none;
-        }
-        .transacted-item-type-product .transacted-item-activity {
-            display:none;
-        }
-    </style>
 @endsection
