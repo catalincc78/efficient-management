@@ -30,6 +30,7 @@
     @parent
     <script type="module">
         var nTransactionsCurrentPage = 1;
+        var openedTransactionDetails;
         var loadTransactionList = function(html = undefined) {
             if(html !== undefined){
                 $('.transactions-list').html(html);
@@ -59,7 +60,7 @@
             }
         });
 
-        // Add Transaction
+        // Show Add or Edit Transaction modal
         $(document).on('click', '.btn-transaction-add, .btn-transaction-edit', function(evt){
             let modalSelector = $('#modal-transaction-add-or-edit');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -76,9 +77,9 @@
                     dataType: "json",
                     success: function(response) {
                         if(response.success === 1){
+                            let itemsContainer = modalSelector.find('.mtae-transacted-items-container');
+                            itemsContainer.html(response.html);
                             modalSelector.find('[name="id"]').val(response.transaction.id);
-                            modalSelector.find('[name="name"]').val(response.transaction.name);
-                            modalSelector.find('[name="sku"]').val(response.transaction.sku);
                             modal.show();
                         }
                     }
@@ -88,7 +89,9 @@
                 modal.show();
             }
         });
+        // End of Show Add or Edit Transaction modal
 
+        // Manage Items Row
         $(document).on('click', '#modal-transaction-add-or-edit .btn-add-item', function() {
             let modalSelector = $('#modal-transaction-add-or-edit');
             let itemsContainer = modalSelector.find('.mtae-transacted-items-container');
@@ -114,7 +117,21 @@
             let item = $(evt.currentTarget).closest('.transacted-item-row');
             item.remove();
         });
+        // End of Manage Items Row
 
+        // Show Details Transaction Modal
+        $(document).on('click', '.btn-transaction-details', function(evt){
+            let btn = $(evt.currentTarget);
+            let transaction = btn.closest('.transaction').next();
+            let visible = transaction.is(':visible');
+            $('.transaction-details-container').hide();
+            if(!visible){
+                transaction.show();
+            }
+        });
+        // End Of Show Details Transaction Modal
+
+        // Save transaction
         $(document).on('click', '#modal-transaction-add-or-edit .btn-save', function(){
             let data = $('#modal-transaction-add-or-edit form').serialize();
             data += '&page=' + nTransactionsCurrentPage;
@@ -138,13 +155,15 @@
                         $('#modal-transaction-add-or-edit .form-control').removeClass('is-invalid');
                         for(let fieldName in response.messages){
                             let arName = fieldName.split('.');
-                            $($('#modal-transaction-add-or-edit [name="'+ arName[0] + '[]"]')[arName[1]]).addClass('is-invalid').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
+                            let field = $('#modal-transaction-add-or-edit [name="'+ arName[0] + '[]"]')[arName[1]];
+                            $(field).addClass('is-invalid').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
                         }
                     }
                 }
             });
         })
 
+        // Delete Transaction
         $(document).on('click', '.btn-transaction-delete', function(evt){
             let modalSelector = $('#modal-transaction-delete');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -175,7 +194,7 @@
                 }
             });
         });
-
+        // End Of Delete Transaction
 
 
         $(document).ready(function() {

@@ -7,7 +7,7 @@
                     <h1 class="modal-title fs-5" id="transaction-add-or-edit-title">{{ __('Transaction Info') }}</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body pb-0">
                     <div class="transaction-add-or-edit-notification"></div>
                     <form>
                         @csrf
@@ -20,9 +20,10 @@
                         @include('transactions.transacted_items.edit')
 
                     </div>
-                    <button type="button" class="btn btn-info btn-add-item">{{ __('Add Item') }}</button>
+
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-info me-auto btn-add-item">{{ __('Add Item') }}</button>
                     <button type="button" class="btn btn-primary btn-save">{{ __('Save') }}</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
                 </div>

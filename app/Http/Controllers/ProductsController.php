@@ -79,7 +79,7 @@ class ProductsController extends Controller
 
     public static function delete($id)
     {
-        Products::where('id', $id)->delete();
+        Products::where('id', $id)->update(['active' => 0]);
         $products = Helper::getPaginatedProducts();
         return response()->json([
             'success' => 1,

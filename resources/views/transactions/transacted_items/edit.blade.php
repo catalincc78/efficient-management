@@ -25,7 +25,7 @@ $isAmountPositive = ($item->amount > 0 || ($item->amount === 0 && $item->quantit
             </div>
         </button>
         <div class="flex-fill transacted-item-amount">
-            <input type="text" class="form-control input-type-float" name="amount[]" {!! $item->amount ?? ' value="'.$item->amount.'"' !!} placeholder="{{ __('Amount') }}">
+            <input type="text" class="form-control input-type-float" name="amount[]" {!! !empty($item->amount) ? ' value="'.abs(floatval($item->amount)).'"' : '' !!} placeholder="{{ __('Amount') }}">
             <span class="invalid-feedback" role="alert"><strong></strong></span>
         </div>
         <button style="height:37px;" type="button" class="btn btn-danger btn-transacted-item-delete d-lg-none ms-1"><i class="fa-solid fa-trash-can"></i></button>
@@ -47,7 +47,7 @@ $isAmountPositive = ($item->amount > 0 || ($item->amount === 0 && $item->quantit
             <span class="invalid-feedback" role="alert"><strong></strong></span>
         </div>
         <div class="flex-fill transacted-item-quantity" style="max-width:130px;">
-            <input type="text" class="form-control input-type-int" name="quantity[]"{!! $item->quantity ?? ' value="'.$item->quantity.'"' !!}" placeholder="{{ __('Quantity') }}">
+            <input type="text" class="form-control input-type-int" name="quantity[]"{!! !empty($item->quantity) ? ' value="'.abs(intval($item->quantity)).'"' : '' !!}" placeholder="{{ __('Quantity') }}">
             <span class="invalid-feedback" role="alert"><strong></strong></span>
         </div>
         <button style="height:37px;" type="button" class="btn btn-danger btn-transacted-item-delete d-none d-lg-block ms-1"><i class="fa-solid fa-trash-can"></i></button>
