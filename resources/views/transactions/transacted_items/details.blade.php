@@ -5,24 +5,26 @@
 <div class="row g-0 border border-dark border-opacity-25 rounded p-1 mb-2
     transacted-item-row{{$item->id === 0 ? ' placeholder-item' : ''}}{{$item->target_type === 'activity' ? ' transacted-item-type-activity' : ' transacted-item-type-product'}}
     {{$isAmountPositive ? ' transacted-item-amount-positive' : ' transacted-item-amount-negative'}}">
-    <div class="col col-12 col-lg-3 mb-2 mb-lg-0 pe-lg-2 d-flex ">
-        <div class="flex-fill transacted-item-amount">
-            {{$item->amount}}
-        </div>
-    </div>
     <div class="col col-12 col-lg-9 d-flex">
         @if($item->target_type === 'activity')
             <div class="flex-fill transacted-item-activity">
-                {{$item->activity}}
+                 <strong>{{$item->activity}}</strong>
             </div>
         @else
             <div class="flex-fill transacted-item-product me-1">
-                {{$item->product->name}}
+                <strong>{{$item->product->name}}</strong>
+            </div>
+            <div class="flex-fill me-1">
             </div>
             <div class="flex-fill transacted-item-quantity" style="max-width:130px;">
-                {{$item->quantity}}
+                <strong>x{{$item->quantity}}</strong>
             </div>
         @endif
+        <div class="col col-12 col-lg-3 mb-2 mb-lg-0 pe-lg-2 d-flex ">
+            <div class="flex-fill transacted-item-amount" style="{{$isAmountPositive ? 'color: green;' : 'color: red;'}}">
+                <strong>{{$item->amount}}</strong>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -58,6 +60,5 @@
         .transacted-item-amount-negative .transacted-item-quantity input, .transacted-item-amount-positive .transacted-item-amount input{
             color:green;
         }
-
     </style>
 @endsection
