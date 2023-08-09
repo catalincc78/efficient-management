@@ -123,11 +123,14 @@
         // Show Details Transaction Modal
         $(document).on('click', '.btn-transaction-details', function(evt){
             let btn = $(evt.currentTarget);
-            let transaction = btn.closest('.transaction').next();
-            let visible = transaction.is(':visible');
+            let transaction = btn.closest('.transaction');
+            let details = transaction.next();
+            let visible = details.is(':visible');
             $('.transaction-details-container').hide();
+            $('.transaction-details-container').prev().find(' > td > div').removeClass('details-visible');
             if(!visible){
-                transaction.show();
+                details.show();
+                transaction.find(' > td > div').addClass('details-visible');
             }
         });
         // End Of Show Details Transaction Modal
@@ -213,5 +216,59 @@
         .transactions-list nav p{
             margin-bottom: 0;
         }
+        .transacted-item-details-type-activity .transacted-item-details-product {
+            display:none;
+        }
+        .transacted-item-details-type-product .transacted-item-details-activity {
+            display:none;
+        }
+        .transacted-item-details-amount-positive .transacted-item-details-quantity , .transacted-item-details-amount-negative .transacted-item-details-amount strong{
+            color:red;
+        }
+        .transacted-item-details-amount-negative .transacted-item-details-quantity , .transacted-item-details-amount-positive .transacted-item-details-amount strong{
+            color:green;
+        }
+
+        .toc-list .toc-row {
+            text-decoration: none;
+            display: grid;
+            grid-template-columns: auto max-content;
+            align-items: end;
+        }
+
+        .toc-list .title {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toc-list .leaders::after {
+            position: absolute;
+            padding-inline-start: .25ch;
+            content: " . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . . . . "
+            ". . . . . . . . . . . . . . . . . . . . . . . ";
+            text-align: right;
+        }
+
+        .toc-list .page {
+            min-width: 2ch;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        .transaction > td > div{
+            border-radius: 10px;
+            border: 1px solid #DEECDC;
+        }
+        .details-visible {
+            border-bottom-left-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            border-bottom: 0 !important;
+        }
     </style>
 @endsection
+

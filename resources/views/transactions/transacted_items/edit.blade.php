@@ -56,6 +56,7 @@ $isAmountPositive = ($item->amount > 0 || ($item->amount === 0 && $item->quantit
 
 
 @section('styles')
+    @parent
     <style>
         .transacted-item-type-activity .transacted-item-product,
         .transacted-item-type-activity .transacted-item-quantity,
