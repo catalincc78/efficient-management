@@ -31,6 +31,7 @@
     <script type="module">
         var nTransactionsCurrentPage = 1;
         var openedTransactionDetails;
+        
         var loadTransactionList = function(html = undefined) {
             if(html !== undefined){
                 $('.transactions-list').html(html);
