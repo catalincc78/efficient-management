@@ -96,12 +96,9 @@ class TransactionsController extends Controller
             DB::table('transacted_items')->insert($data);
         }
 
-        $transactions = Helper::getPaginatedTransactions();
-        info(view('transactions.list', ['transactions' => $transactions])->render());
         return response()->json([
             'success' => 1,
             'messages' => ['Transaction ' . ($isEdit ? 'updated' : 'created') . ' successfully!'],
-            'html' => view('transactions.list', ['transactions' => $transactions])->render()
         ]);
     }
     public static function add(){
@@ -114,11 +111,9 @@ class TransactionsController extends Controller
 
     public static function delete($id){
         Transactions::where('id', $id)->update(['active' => 0]);
-        $transactions = Helper::getPaginatedTransactions();
         return response()->json([
             'success' => 1,
             'messages' => ['Transaction has been deleted successfully!'],
-            'html' => view('transactions.list', ['transactions' => $transactions])->render()
         ]);
     }
 }

@@ -1,4 +1,10 @@
 import * as bootstrap from 'bootstrap';
 import $ from 'jquery';
+import Chart from 'chart.js/auto';
+import { easepick } from '@easepick/bundle';
+import { LockPlugin } from '@easepick/lock-plugin';
 window.$ = $;
 window.bootstrap = bootstrap;
+window.Chart = Chart;
+window.easepick = easepick;
+window.LockPlugin = LockPlugin;

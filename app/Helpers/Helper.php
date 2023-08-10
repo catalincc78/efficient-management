@@ -20,11 +20,20 @@ class Helper
         }
         return $paginated;
     }
-    public static function getPaginatedTransactions($arFilters = []){
+    public static function getPaginatedTransactions(){
         $perPage = 2;
         $transactions = Transactions::with(['transacted_items'])
             ->where('user_id', auth()->user()->id)
-            ->where('active', 1);
+            ->where('active', 1)
+            ->where('created_at', '>', request()->filter_date_start)
+            ->where('created_at', '<', gmdate('Y-m-d H:i:s', strtotime(request()->filter_date_end.' + 1 day')));
+        if(!empty(request()->filter_product)){
+            $transactions->whereHas('transacted_items', function($query){
+                $query->whereHas('product', function($query){
+                   $query->where('product_id', request()->filter_product);
+                });
+            });
+        }
 
         $paginated = $transactions->paginate($perPage);
         if($paginated->lastPage() < $paginated->currentPage()){

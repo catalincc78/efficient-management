@@ -14,8 +14,10 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "@easepick/bundle": "^1.2.1",
         "@fortawesome/fontawesome-free": "^6.4.2",
         "bootstrap-icons": "^1.10.5",
+        "chart.js": "^4.3.3",
         "jquery": "^3.7.0",
         "tooltip": "^1.6.1"
     }

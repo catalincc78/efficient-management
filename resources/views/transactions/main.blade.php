@@ -11,6 +11,27 @@
                     </div>
 
                     <div class="card-body">
+                        <div class="d-flex flex-column flex-md-row mb-3 gap-0 column-gap-3 transaction-filters">
+                            <div class="text-center mb-3 mb-md-0">
+                                <label for="filter_date_start"><b>{{__('Start Date')}}</b></label>
+                                <input class="form-control text-center mx-auto" style="width:120px;" id="filter_date_start"/>
+                            </div>
+                            <div class="text-center mb-3 mb-md-0">
+                                <label for="filter_date_end"><b>{{__('End Date')}}</b></label>
+                                <input class="form-control text-center mx-auto" style="width:120px;" id="filter_date_end"/>
+                            </div>
+                            <div class="flex-fill">
+                            </div>
+                            <div class="text-center align-self-md-end">
+                                <label for="filter_product"><b>{{__('Product')}}</b></label>
+                                <select type="text" class="form-control mx-auto" style="width:120px;" id="filter_product">
+                                    <option value="0">{{ __('All Products') }}</option>
+                                    @foreach($products as $product)
+                                        <option value="{{$product->id}}">{{$product->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="transactions-list-notifications">
                             {{-- Loaded with AJAX --}}
                         </div>
@@ -18,6 +39,9 @@
                             {{-- Loaded with AJAX --}}
                         </div>
                     </div>
+                </div>
+                <div class="mt-3">
+                    <canvas id="investmentChart" width="600" height="400"></canvas>
                 </div>
             </div>
         </div>
@@ -29,17 +53,24 @@
 @section('scripts')
     @parent
     <script type="module">
+
         var nTransactionsCurrentPage = 1;
         var openedTransactionDetails;
-        
         var loadTransactionList = function(html = undefined) {
             if(html !== undefined){
                 $('.transactions-list').html(html);
                 return false;
             }
+            let data = {
+                page: nTransactionsCurrentPage,
+                filter_date_start: $('#filter_date_start').val(),
+                filter_date_end: $('#filter_date_end').val(),
+                filter_product: $('#filter_product').val()
+            };
             $.ajax({
                 type: "GET",
-                url: "{{ route('transaction.list') }}?page=" + nTransactionsCurrentPage,
+                url: "{{ route('transaction.list') }}",
+                data: data,
                 dataType: "json",
                 success: function(response) {
                     if(response.success === 1){
@@ -124,13 +155,11 @@
         $(document).on('click', '.btn-transaction-details', function(evt){
             let btn = $(evt.currentTarget);
             let transaction = btn.closest('.transaction');
-            let details = transaction.next();
+            let details = transaction.find('.transaction-details-container');
             let visible = details.is(':visible');
             $('.transaction-details-container').hide();
-            $('.transaction-details-container').prev().find(' > td > div').removeClass('details-visible');
             if(!visible){
                 details.show();
-                transaction.find(' > td > div').addClass('details-visible');
             }
         });
         // End Of Show Details Transaction Modal
@@ -140,7 +169,6 @@
             let data = $('#modal-transaction-add-or-edit form').serialize();
             data += '&page=' + nTransactionsCurrentPage;
             let nId = $('#modal-transaction-add-or-edit form [name="id"]').val();
-            console.log('before ajax');
             $.ajax({
                 type: nId ? "PUT" : "POST",
                 url: nId ? "transaction/" + nId : "{{ route('transaction.add') }}",
@@ -149,7 +177,7 @@
                 success: function(response) {
                     console.log(response);
                     if(response.success === 1){
-                        loadTransactionList(response.html);
+                        loadTransactionList();
                         showNotification('.transactions-list-notifications', response.messages);
                         $('#modal-transaction-add-or-edit .btn-close').click();
                     }else{
@@ -191,7 +219,7 @@
                 dataType: "json",
                 success: function(response) {
                     if(response.success === 1){
-                        loadTransactionList(response.html);
+                        loadTransactionList();
                         showNotification('.transactions-list-notifications', response.messages);
                         modal.hide();
                     }
@@ -199,6 +227,96 @@
             });
         });
         // End Of Delete Transaction
+
+        // Filters
+        var startDatePicker;
+        var endDatePicker;
+        function createDatePicker(pickerSelector, minDate = null, maxDate = null){
+            let instanceSelector = (pickerSelector === '#filter_date_start') ? 'startDatePicker' : 'endDatePicker';
+            let currentDate = new Date();
+            if(window[instanceSelector] !== undefined){
+                currentDate = window[instanceSelector].getDate();
+            }
+            if(pickerSelector === '#filter_date_start'){
+                maxDate = (maxDate === null) ? currentDate : maxDate;
+            }else{
+                minDate = (minDate === null) ? currentDate : minDate;
+            }
+            let currentPicker = new easepick.create({
+                element: $(pickerSelector)[0],
+                css: [
+                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+                ],
+                plugins: [LockPlugin],
+                LockPlugin: {
+                    minDate: minDate,
+                    maxDate: maxDate
+                },
+                zIndex: 4,
+                date: currentDate,
+                setup(picker) {
+                    picker.on('select', function(e){
+                        if(pickerSelector === '#filter_date_start'){
+                            createDatePicker('#filter_date_end', e.detail.date);
+                        }else{
+                            createDatePicker('#filter_date_start', null, e.detail.date);
+                        }
+                        loadTransactionList();
+                    })
+                }
+            });
+            if(window[instanceSelector] !== undefined){
+                window[instanceSelector].destroy();
+            }
+            window[instanceSelector] = currentPicker;
+        }
+        createDatePicker('#filter_date_start');
+        createDatePicker('#filter_date_end');
+
+        $(document).on('change', '#filter_product', function(){
+            loadTransactionList();
+        });
+        // Chart
+        var investmentChartCtx = document.getElementById('investmentChart').getContext('2d');
+
+        // Example data, replace with your actual data
+        var totalActivitiesAmount = 17000;
+        var totalProductTransactionsAmount = -2000;
+
+        var investmentChartData = {
+            labels: ["Activities", "Product Transactions"],
+            datasets: [
+                {
+                    label: "Amount (in $)",
+                    //data vine din php
+                    data: [totalActivitiesAmount, totalProductTransactionsAmount]
+                }
+            ]
+        };
+        // daca response e success {
+        // Calculate background colors based on amounts
+        var backgroundColors = investmentChartData.datasets[0].data.map(amount => amount >= 0 ? "#3cba9f" : "#ff0000");
+        investmentChartData.datasets[0].backgroundColor = backgroundColors;
+
+        var investmentChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        };
+
+        var investmentChart = new Chart(investmentChartCtx, {
+            type: 'bar',
+            data: investmentChartData,
+            options: investmentChartOptions
+        });
+
+        // }
+
 
 
         $(document).ready(function() {
@@ -268,6 +386,16 @@
             border-bottom-left-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
             border-bottom: 0 !important;
+        }
+
+        .transaction-cell-date {
+            max-width:154px;
+        }
+        .transaction-cell-actions{
+           width:140px;
+        }
+        .easepick-wrapper #shadow-root .container{
+            z-index:4;
         }
     </style>
 @endsection
