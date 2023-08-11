@@ -40,3 +40,9 @@ Route::prefix('transaction')->group(function () {
     Route::put('/{id}','TransactionsController@edit')->name('transaction.edit');
     Route::delete('/{id}','TransactionsController@delete')->name('transaction.delete');
 });
+
+Route::get('/statistics','StatisticsController@main')->name('statistic.main');
+
+Route::prefix('statistic')->group(function() {
+    Route::get('/', 'StatisticsController@list')->name('statistic.list');
+});

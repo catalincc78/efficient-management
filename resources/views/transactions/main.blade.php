@@ -102,7 +102,7 @@
             modalSelector.find('form')[0].reset();
             modalSelector.find('.mtae-transacted-items-container').html('');
             if(btn.hasClass('btn-transaction-edit')){
-                let nId = btn.closest('tr').attr('data-id');
+                let nId = btn.closest('.transaction').attr('data-id');
                 $.ajax({
                     type: "GET",
                     url: "transaction/" + nId,
@@ -200,7 +200,7 @@
             let modalSelector = $('#modal-transaction-delete');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
             let btn = $(evt.currentTarget);
-            let nId = btn.closest('tr').attr('data-id');
+            let nId = btn.closest('.transaction').attr('data-id');
             modalSelector.find('[name="id"]').val(nId);
             modal.show();
         });
@@ -294,8 +294,7 @@
                 }
             ]
         };
-        // daca response e success {
-        // Calculate background colors based on amounts
+
         var backgroundColors = investmentChartData.datasets[0].data.map(amount => amount >= 0 ? "#3cba9f" : "#ff0000");
         investmentChartData.datasets[0].backgroundColor = backgroundColors;
 
@@ -310,12 +309,11 @@
         };
 
         var investmentChart = new Chart(investmentChartCtx, {
-            type: 'bar',
+            type: 'line',
             data: investmentChartData,
             options: investmentChartOptions
         });
 
-        // }
 
 
 
