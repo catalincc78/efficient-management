@@ -15,7 +15,8 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
+        $faker = Faker::create('en_US');
+        $faker->locale('en_US');
         $userId = 1;
         foreach (range(1, 40) as $index) {
             DB::table('products')->insert([

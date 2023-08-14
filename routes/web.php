@@ -20,6 +20,7 @@ Auth::routes();
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/profile', 'UsersController@viewProfile')->name('profile');
 
 Route::get('/products','ProductsController@main')->name('product.main');
 
