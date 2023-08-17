@@ -27,9 +27,10 @@ class ProductsController extends Controller
 
     public static function get($id)
     {
+        $product = Products::where('user_id', auth()->user()->id)->where('active', 1)->find($id);
         return response()->json([
-            'success' => 1,
-            'product' => Products::find($id)
+            'success' => $product ? 1 : 0,
+            'product' => $product
         ]);
     }
     private static function saveProduct($id = 0)
@@ -54,7 +55,7 @@ class ProductsController extends Controller
             ]);
         }else{
             if(!empty($id)){
-                DB::table('products')->where('id' , $id)->update($data);
+                DB::table('products')->where('id' , $id)->where('user_id', auth()->user()->id)->update($data);
             }else{
                 DB::table('products')->insert($data);
             }
@@ -79,7 +80,7 @@ class ProductsController extends Controller
 
     public static function delete($id)
     {
-        Products::where('id', $id)->update(['active' => 0]);
+        Products::where('id', $id)->where('user_id', auth()->user()->id)->update(['active' => 0]);
         $products = Helper::getPaginatedProducts();
         return response()->json([
             'success' => 1,

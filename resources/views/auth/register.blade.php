@@ -56,7 +56,6 @@
     <script type="module">
             $('#form-register input[name="type"]').change(function(){
                 let fields = $('#form-register input[name="company_name"], #form-register input[name="company_position"], #form-register input[name="cif"]');
-                console.log($('#form-register input[name="type"]:checked').val());
                 if($('#form-register input[name="type"]:checked').val() === 'company'){
                     fields.closest('.row').removeClass('d-none').show();
                 }else{

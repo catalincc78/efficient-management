@@ -134,7 +134,6 @@
                         showNotification('.products-list-notifications', response.messages);
                         $('#modal-product-add-or-edit .btn-close').click();
                     }else{
-                        console.log(response.messages);
                         $('#modal-product-add-or-edit .form-control').removeClass('is-invalid');
                         for(let fieldName in response.messages){
                             $('#modal-product-add-or-edit input[name="'+ fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);

@@ -37,4 +37,48 @@
          return /^\d*$/.test(value);
      }, '{{ __('Type only digits!') }}');
 
+     window.createDatePicker =  function(pickerSelector, onChangeCallback = null, minDate = null, maxDate = null) {
+         let bIsStart = pickerSelector.includes('start');
+         let arSplitSelector = bIsStart ? pickerSelector.split('start') : pickerSelector.split('end');
+         let sSuffix = (arSplitSelector.length > 1) ? arSplitSelector[1] : '';
+         let reversePickerSelector = arSplitSelector[0] + (bIsStart ? 'end' : 'start') + sSuffix;
+         let instanceSelector = bIsStart ? 'startDatePicker' + sSuffix : 'endDatePicker' + sSuffix;
+         let currentDate = new Date();
+         if (window[instanceSelector] !== undefined) {
+             currentDate = window[instanceSelector].getDate();
+             window[instanceSelector].destroy();
+         }
+         if (bIsStart) {
+             maxDate = (maxDate === null) ? currentDate : maxDate;
+         } else {
+             minDate = (minDate === null) ? currentDate : minDate;
+         }
+         let currentPicker = new easepick.create({
+             element: $(pickerSelector)[0],
+             css: [
+                 'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
+                 'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
+             ],
+             plugins: [LockPlugin],
+             LockPlugin: {
+                 minDate: minDate,
+                 maxDate: maxDate
+             },
+             zIndex: 4,
+             date: currentDate,
+             setup(picker) {
+                 picker.on('select', function (e) {
+                     if (bIsStart) {
+                         createDatePicker(reversePickerSelector, onChangeCallback, e.detail.date);
+                     } else {
+                         createDatePicker(reversePickerSelector, onChangeCallback, null, e.detail.date);
+                     }
+                     if(onChangeCallback){
+                         onChangeCallback();
+                     }
+                 })
+             }
+         });
+         window[instanceSelector] = currentPicker;
+     }
 </script>

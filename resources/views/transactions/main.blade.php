@@ -175,7 +175,6 @@
                 data: data,
                 dataType: "json",
                 success: function(response) {
-                    console.log(response);
                     if(response.success === 1){
                         loadTransactionList();
                         showNotification('.transactions-list-notifications', response.messages);
@@ -229,93 +228,12 @@
         // End Of Delete Transaction
 
         // Filters
-        var startDatePicker;
-        var endDatePicker;
-        function createDatePicker(pickerSelector, minDate = null, maxDate = null){
-            let instanceSelector = (pickerSelector === '#filter_date_start') ? 'startDatePicker' : 'endDatePicker';
-            let currentDate = new Date();
-            if(window[instanceSelector] !== undefined){
-                currentDate = window[instanceSelector].getDate();
-            }
-            if(pickerSelector === '#filter_date_start'){
-                maxDate = (maxDate === null) ? currentDate : maxDate;
-            }else{
-                minDate = (minDate === null) ? currentDate : minDate;
-            }
-            let currentPicker = new easepick.create({
-                element: $(pickerSelector)[0],
-                css: [
-                    'https://cdn.jsdelivr.net/npm/@easepick/core@1.2.1/dist/index.css',
-                    'https://cdn.jsdelivr.net/npm/@easepick/lock-plugin@1.2.1/dist/index.css',
-                ],
-                plugins: [LockPlugin],
-                LockPlugin: {
-                    minDate: minDate,
-                    maxDate: maxDate
-                },
-                zIndex: 4,
-                date: currentDate,
-                setup(picker) {
-                    picker.on('select', function(e){
-                        if(pickerSelector === '#filter_date_start'){
-                            createDatePicker('#filter_date_end', e.detail.date);
-                        }else{
-                            createDatePicker('#filter_date_start', null, e.detail.date);
-                        }
-                        loadTransactionList();
-                    })
-                }
-            });
-            if(window[instanceSelector] !== undefined){
-                window[instanceSelector].destroy();
-            }
-            window[instanceSelector] = currentPicker;
-        }
-        createDatePicker('#filter_date_start');
-        createDatePicker('#filter_date_end');
+        createDatePicker('#filter_date_start', loadTransactionList);
+        createDatePicker('#filter_date_end', loadTransactionList);
 
         $(document).on('change', '#filter_product', function(){
             loadTransactionList();
         });
-        // Chart
-        var investmentChartCtx = document.getElementById('investmentChart').getContext('2d');
-
-        // Example data, replace with your actual data
-        var totalActivitiesAmount = 17000;
-        var totalProductTransactionsAmount = -2000;
-
-        var investmentChartData = {
-            labels: ["Activities", "Product Transactions"],
-            datasets: [
-                {
-                    label: "Amount (in $)",
-                    //data vine din php
-                    data: [totalActivitiesAmount, totalProductTransactionsAmount]
-                }
-            ]
-        };
-
-        var backgroundColors = investmentChartData.datasets[0].data.map(amount => amount >= 0 ? "#3cba9f" : "#ff0000");
-        investmentChartData.datasets[0].backgroundColor = backgroundColors;
-
-        var investmentChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        };
-
-        var investmentChart = new Chart(investmentChartCtx, {
-            type: 'line',
-            data: investmentChartData,
-            options: investmentChartOptions
-        });
-
-
-
 
         $(document).ready(function() {
             loadTransactionList();

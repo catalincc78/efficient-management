@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class TransactionsController extends Controller
 {
     public static function main(){
-        $products = Products::all();
+        $products =  Products::where('user_id', auth()->user()->id)->where('active', 1)->get();
         return view('transactions.main', ['products' => $products]);
     }
     public static function list(){
@@ -25,17 +25,26 @@ class TransactionsController extends Controller
     }
 
     public static function get($id){
-        $transaction = Transactions::with(['transacted_items'])->find($id);
-        $products = Products::all();
-        $transactedItemsHTML = '';
-        foreach($transaction->transacted_items as $item){
-            $transactedItemsHTML .= view('transactions.transacted_items.edit', ['item' => $item, 'products' => $products])->render();
+        $transaction = Transactions::with(['transacted_items'])
+                        ->where('user_id', auth()->user()->id)
+                        ->where('active', 1)
+                        ->find($id);
+        $products =  Products::where('user_id', auth()->user()->id)->where('active', 1)->get();
+        if($transaction) {
+            $transactedItemsHTML = '';
+            foreach ($transaction->transacted_items as $item) {
+                $transactedItemsHTML .= view('transactions.transacted_items.edit', ['item' => $item, 'products' => $products])->render();
+            }
+            return response()->json([
+                'success' => 1,
+                'transaction' => $transaction,
+                'html' => $transactedItemsHTML
+            ]);
+        }else{
+            return response()->json([
+                'success' => 0,
+            ]);
         }
-        return response()->json([
-            'success' => 1,
-            'transaction' => $transaction,
-            'html' => $transactedItemsHTML
-        ]);
     }
 
     private static function saveTransaction($id = 0){
@@ -77,7 +86,7 @@ class TransactionsController extends Controller
         ];
 
         if($isEdit){
-            DB::table('transactions')->where('id' , $id)->update($data);
+            DB::table('transactions')->where('id' , $id)->where('user_id', auth()->user()->id)->update($data);
         }else{
             $id = DB::table('transactions')->insertGetId($data);
         }
@@ -110,7 +119,7 @@ class TransactionsController extends Controller
     }
 
     public static function delete($id){
-        Transactions::where('id', $id)->update(['active' => 0]);
+        Transactions::where('id', $id)->where('user_id', auth()->user()->id)->update(['active' => 0]);
         return response()->json([
             'success' => 1,
             'messages' => ['Transaction has been deleted successfully!'],
