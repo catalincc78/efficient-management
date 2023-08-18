@@ -15,16 +15,57 @@ class StatisticsController extends Controller
         $products =  Products::where('user_id', auth()->user()->id)->where('active', 1)->get();
         return view('statistics.main', ['products' => $products]);
     }
-    public static function list(){
+    public static function chartDailyAmount(){
         $availableData = Transactions::selectRaw('DATE(transactions.created_at) AS date, COALESCE(SUM(transacted_items.amount), 0) AS total_amount')
-            ->leftJoin('transacted_items', function ($join){
-                $join->on('transactions.id', '=', 'transacted_items.transaction_id');
-            })
+            ->leftJoin('transacted_items', 'transactions.id', '=', 'transacted_items.transaction_id')
             ->whereBetween('transactions.created_at', [request()->filter_date_start, gmdate('Y-m-d H:i:s', strtotime(request()->filter_date_end.' + 1 day'))])
             ->where('transactions.user_id', auth()->user()->id)
             ->where('transactions.active', 1)
+            ->when(!empty(request()->filter_product), function($query){
+                $query->where('transacted_items.product_id', request()->filter_product);
+            })
             ->groupBy('date')
             ->orderBy('date')
+            ->get();
+
+        $interval = new DateInterval('P1D');
+        $date_range = new DatePeriod(date_create(request()->filter_date_start), $interval, date_create(gmdate('Y-m-d H:i:s', strtotime(request()->filter_date_end.' + 1 day'))));
+
+        $chartData = [];
+
+        foreach ($date_range as $date) {
+            $chartData[$date->format('Y-m-d')] = (object)[
+                'date' => $date->format('Y-m-d'),
+                'total_amount' => 0
+            ];
+        }
+        foreach($availableData as $data) {
+            info($data);
+            $chartData[$data->date] = (object)[
+                'date' => $data->date,
+                'total_amount' => $data->total_amount
+            ];
+        }
+        return response()->json([
+            'success' => 1,
+            'chartData' => array_values($chartData)
+        ]);
+    }
+    public static function chartDailyStock(){
+
+    }
+    public static function chartTotalAmount(){
+
+    }
+    public static function chartProfitPerProduct(){
+        $availableData = Transactions::selectRaw('COALESCE(SUM(transacted_items.amount), 0) AS total_amount')
+            ->leftJoin('transacted_items', 'transactions.id', '=', 'transacted_items.transaction_id')
+            ->whereBetween('transactions.created_at', [request()->filter_date_start, gmdate('Y-m-d H:i:s', strtotime(request()->filter_date_end.' + 1 day'))])
+            ->where('transactions.user_id', auth()->user()->id)
+            ->where('transactions.active', 1)
+            ->when(!empty(request()->filter_product), function($query){
+                $query->where('transacted_items.product_id', request()->filter_product);
+            })
             ->get();
 
         $interval = new DateInterval('P1D');

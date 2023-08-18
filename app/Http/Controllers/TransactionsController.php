@@ -64,18 +64,29 @@ class TransactionsController extends Controller
             $itemRules = [
                 'target_type.' . $index => ['required', 'in:product,activity'],
                 'product_id.' . $index => ['nullable', 'required_if:target_type.' . $index . ',product', 'numeric'],
-                'quantity.' . $index => ['nullable', 'required_if:target_type.' . $index . ',product', 'numeric'],
+                'quantity.' . $index => ['nullable', 'required_if:target_type.' . $index . ',product', 'numeric', 'not_in:0'],
                 'activity.' . $index => ['nullable', 'required_if:target_type.' . $index . ',activity', 'string', 'max:1000'],
                 'amount.' . $index => ['required', 'numeric'],
                 'is_amount_positive.' . $index => ['required', 'numeric', 'in:0,1'],
             ];
             $rules = array_merge($rules, $itemRules);
         }
+        $errorMessages = [
+            'product_id.*.required_if' => __('You need to choose a <strong>product</strong> from the list.'),
+            'quantity.*.required_if' => __('The <strong>quantity</strong> field is required.'),
+            'quantity.*.not_in' => __('The <strong>quantity</strong> cannot be 0.'),
+            'activity.*.required_if' => __('The <strong>activity</strong> field is required.'),
+            'amount.*.required' => __('The <strong>amount</strong> field is required.')
+        ];
 
-        $validator = Validator::make($inputData, $rules);
-
+//        $attributeNames = [
+//            'amount.*' => 'Amount',
+//            'product_id.*' => 'Product',
+//            'quantity.*' => 'Quantity',
+//            'activity.*' => 'Activity'
+//        ];
+        $validator = Validator::make($inputData, $rules, $errorMessages);
         if($validator->fails()) {
-            info($validator->errors());
             return response()->json([
                 'success' => 0,
                 'messages' => $validator->errors(),

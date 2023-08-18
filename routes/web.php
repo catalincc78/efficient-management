@@ -45,5 +45,8 @@ Route::prefix('transaction')->group(function () {
 Route::get('/statistics','StatisticsController@main')->name('statistic.main');
 
 Route::prefix('statistic')->group(function() {
-    Route::get('/', 'StatisticsController@list')->name('statistic.list');
+    Route::get('/chart-daily-amount', 'StatisticsController@chartDailyAmount')->name('statistic.chart.daily-amount');
+    Route::get('/chart-daily-stock', 'StatisticsController@chartDailyStock')->name('statistic.chart.daily-stock');
+    Route::get('/chart-total-amount', 'StatisticsController@chartTotalAmount')->name('statistic.chart.total-amount');
+    Route::get('/chart-profit-per-product', 'StatisticsController@chartProfitPerProduct')->name('statistic.chart.profit-per-product');
 });

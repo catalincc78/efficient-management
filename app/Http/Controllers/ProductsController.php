@@ -12,7 +12,8 @@ class ProductsController extends Controller
 {
     public static function main()
     {
-        return view('products.main');
+        $products = Products::where('user_id', auth()->user()->id)->where('active', 1)->get();
+        return view('products.main', ['products' => $products]);
     }
 
     public static function list()
@@ -40,13 +41,22 @@ class ProductsController extends Controller
             'name' => request()->name,
             'sku' => request()->sku,
         ];
-
+        if($id){
+            $currentProduct = Products::find($id);
+        }
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'sku' => ['required', 'string', 'max:255', 'unique:products'],
+            'sku' => ['required', 'string', 'max:255', 'unique:products,sku'.($id ? ',' . $currentProduct->id : '')],
+        ];
+        info($rules);
+
+        $errorMessages = [
+            'name' => __('The <strong>name</strong> field is required'),
+            'sku' => __('The <strong>sku</strong> field is required'),
+            'sku.unique' => __('The sku needs to be unique')
         ];
 
-        $validator = Validator::make($data, $rules);
+        $validator = Validator::make($data, $rules, $errorMessages);
 
         if($validator->fails()){
             return response()->json([
@@ -62,7 +72,7 @@ class ProductsController extends Controller
             $products = Helper::getPaginatedProducts();
             return response()->json([
                 'success' => 1,
-                'messages' => ['Product ' . (empty($id) ? 'created' : 'updated') . ' successfully!'],
+                'messages' => [__('Product ' . (empty($id) ? 'created' : 'updated') . ' successfully!')],
                 'html' => view('products.list', ['products' => $products])->render()
             ]);
         }
@@ -84,7 +94,7 @@ class ProductsController extends Controller
         $products = Helper::getPaginatedProducts();
         return response()->json([
             'success' => 1,
-            'messages' => ['Product has been deleted successfully!'],
+            'messages' => [__('Product has been deleted successfully!')],
             'html' => view('products.list', ['products' => $products])->render()
         ]);
     }

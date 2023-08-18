@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class Helper
 {
     public static function getPaginatedProducts($arFilters = []){
-        $perPage = 2;
+        $perPage = 4;
         $products =  Products::where('user_id', auth()->user()->id)->where('active', 1);
         $paginated = $products->paginate($perPage);
         if($paginated->lastPage() < $paginated->currentPage()){
@@ -21,7 +21,7 @@ class Helper
         return $paginated;
     }
     public static function getPaginatedTransactions(){
-        $perPage = 2;
+        $perPage = 4;
         $transactions = Transactions::with(['transacted_items'])
             ->where('user_id', auth()->user()->id)
             ->where('active', 1)

@@ -4,13 +4,31 @@
         [
             'id' => 'daily_amount',
             'title' => 'Daily Amount',
-            'filters' => ['date_range', 'products_all']
+            'filters' => ['date_range', 'products_all'],
+            'graph_type' => 'bar',
+            'url' => route('statistic.chart.daily-amount')
         ],
+//        [
+//            'id' => 'daily_stock',
+//            'title' => 'Daily Stock',
+//            'filters' => ['date_range', 'products'],
+//            'graph_type' => 'bar',
+//            'url' => route('statistics.chart.daily-stock')
+//        ],
+//        [
+//            'id' => 'total_amount',
+//            'title' => 'Total Amount',
+//            'filters' => ['date_range', 'products_all'],
+//            'graph_type' => 'line',
+//            'url' => route('statistics.chart.total-amount')
+//        ],
         [
-            'id' => 'daily_stock',
-            'title' => 'Daily Stock',
-            'filters' => ['date_range', 'products']
-        ]
+            'id' => 'profit_per_product',
+            'title' => 'Profit per Product',
+            'filters' => ['date_range', 'products_all'],
+            'graph_type' => 'pie',
+            'url' => route('statistic.chart.profit-per-product')
+        ],
     ];
 @endphp
 @section('content')
@@ -27,7 +45,8 @@
     @parent
     <script type="module">
         let arCharts = {!! json_encode($charts) !!};
-        let updateChart = function (selector, labels, data) {
+        let updateChart = function (oChart, labels, data) {
+            let selector = '#chart_' + oChart['id'];
             let ctx = $(selector)[0].getContext('2d');
             let colors = data.map(amount => amount >= 0 ? 'green' : 'red');
             let graph = $(selector).data('graph');
@@ -57,7 +76,8 @@
                 $(selector).data('graph', graph);
             }
         };
-        let loadStatisticsChart = function (chartId) {
+        let loadStatisticsChart = function (oChart) {
+            let chartId = oChart['id'];
             let data = {
                 filter_date_start: $('#filter_date_start_' + chartId).val(),
                 filter_date_end: $('#filter_date_end_' + chartId).val(),
@@ -65,7 +85,7 @@
             };
             $.ajax({
                 type: "GET",
-                url: "{{ route('statistic.list') }}",
+                url: oChart['url'],
                 data: data,
                 dataType: "json",
                 success: function (response) {
@@ -74,20 +94,20 @@
                         var chartData = response.chartData;
                         var labels = chartData.map(entry => entry.date);
                         var data = chartData.map(entry => entry.total_amount);
-                        updateChart('#chart_' + chartId,labels, data);
+                        updateChart(oChart,labels, data);
                     }
                 }
             });
         }
         for(let i = 0; i < arCharts.length; i++){
             let oChart = arCharts[i];
-            createDatePicker('#filter_date_start_' + oChart['id'], function(){loadStatisticsChart(oChart['id'])});
-            createDatePicker('#filter_date_end_' + oChart['id'], function(){loadStatisticsChart(oChart['id'])});
+            createDatePicker('#filter_date_start_' + oChart['id'], function(){loadStatisticsChart(oChart)});
+            createDatePicker('#filter_date_end_' + oChart['id'], function(){loadStatisticsChart(oChart)});
 
             $(document).on('change', '#filter_product_' + oChart['id'], function () {
-                loadStatisticsChart(oChart['id']);
+                loadStatisticsChart(oChart);
             });
-            loadStatisticsChart(oChart['id']);
+            loadStatisticsChart(oChart);
         }
 
     </script>

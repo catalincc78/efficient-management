@@ -8,7 +8,7 @@ $item = $item ?? (object)[
   'activity' => null,
   'amount' => 0
 ];
-$isAmountPositive = ($item->amount > 0 || ($item->amount === 0 && $item->quantity <= 0));
+$isAmountPositive = ($item->amount > 0 || ($item->amount === 0 && $item->quantity <= 0)) ? 1 : 0;
 @endphp
 
 <div class="row g-0 border border-dark border-opacity-25 rounded p-1 mb-2
