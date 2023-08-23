@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helper;
+use App\Models\Products;
+use App\Models\Transactions;
+use Database\Seeders\ProductSeeder;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +27,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $products = Products::where('user_id', auth()->user()->id)->where('active', 1)->get();
+        $transactions = $transactions = Transactions::with(['transacted_items'])
+            ->where('user_id', auth()->user()->id)
+            ->where('active', 1)->get();
+        return view('home', ['products' => $products,
+                                  'transactions' => $transactions]);
     }
 }
