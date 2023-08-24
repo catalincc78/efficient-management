@@ -48,7 +48,6 @@ class ProductsController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'sku' => ['required', 'string', 'max:255', 'unique:products,sku'.($id ? ',' . $currentProduct->id : '')],
         ];
-        info($rules);
 
         $errorMessages = [
             'name' => __('The <strong>name</strong> field is required'),

@@ -43,6 +43,7 @@ Route::prefix('transaction')->group(function () {
 });
 
 Route::get('/statistics','StatisticsController@main')->name('statistic.main');
+Route::get('/validate-vat', 'StatisticsController@validateVAT')->name('statistic.check-vat');
 
 Route::prefix('statistic')->group(function() {
     Route::get('/chart-daily-amount', 'StatisticsController@chartDailyAmount')->name('statistic.chart.daily-amount');

@@ -45,24 +45,29 @@
     @parent
     <script type="module">
         let arCharts = {!! json_encode($charts) !!};
-        let updateChart = function (oChart, labels, data) {
+        let updateChart = function (oChart, chartData) {
             let selector = '#chart_' + oChart['id'];
             let ctx = $(selector)[0].getContext('2d');
-            let colors = data.map(amount => amount >= 0 ? 'green' : 'red');
+            let datasets = [];
+            let labels = [];
+            for(let index in chartData)
+            {
+                if(index === '0'){
+                    labels = (chartData[index].map(entry => entry.label));
+                }
+                let colors = chartData[index].map(entry => entry.color ?? (entry.value >= 0 ? 'green' : 'red'));
+                datasets.push({ data: chartData[index].map(entry => entry.value), backgroundColor: colors });
+            }
             let graph = $(selector).data('graph');
-            let datasets = [{
-                data: data,
-                backgroundColor: colors
-            }];
             if(graph) {
                 graph.data.labels = labels;
                 graph.data.datasets = datasets;
                 graph.update();
             }else {
                 graph =  new Chart(ctx, {
-                    type: 'bar',
+                    type: oChart['graph_type'],
                     data: {
-                        labels: labels,
+                        labels: labels[0],
                         datasets: datasets
                     },
                     options: {
@@ -91,10 +96,7 @@
                 success: function (response) {
                     if (response.success === 1) {
                         $('#statistics_list_' + chartId).html(response.html);
-                        var chartData = response.chartData;
-                        var labels = chartData.map(entry => entry.date);
-                        var data = chartData.map(entry => entry.total_amount);
-                        updateChart(oChart,labels, data);
+                        updateChart(oChart, response.chartData);
                     }
                 }
             });
