@@ -13,7 +13,7 @@ class Helper
     public static function getPaginatedProducts($arFilters = []){
         $perPage = 4;
         $products =  Products::where('user_id', auth()->user()->id)->where('active', 1);
-        $paginated = $products->paginate($perPage);
+        $paginated = $products->orderBy('name')->paginate($perPage);
         if($paginated->lastPage() < $paginated->currentPage()){
             Paginator::currentPageResolver(function() use($paginated){ return $paginated->lastPage();});
             $paginated = $products->paginate($perPage);
@@ -26,7 +26,8 @@ class Helper
             ->where('user_id', auth()->user()->id)
             ->where('active', 1)
             ->where('created_at', '>', request()->filter_date_start)
-            ->where('created_at', '<', gmdate('Y-m-d H:i:s', strtotime(request()->filter_date_end.' + 1 day')));
+            ->where('created_at', '<', gmdate('Y-m-d H:i:s', strtotime(request()->filter_date_end.' + 1 day')))
+            ->orderBy('created_at', 'ASC');
         if(!empty(request()->filter_product)){
             $transactions->whereHas('transacted_items', function($query){
                 $query->whereHas('product', function($query){

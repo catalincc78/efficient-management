@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class StatisticsController extends Controller
 {
     public static function main(){
-        $products =  Products::where('user_id', auth()->user()->id)->where('active', 1)->get();
+        $products =  Products::where('user_id', auth()->user()->id)->where('active', 1)->orderBy('name')->get();
         return view('statistics.main', ['products' => $products]);
     }
     public static function chartDailyAmount(){
