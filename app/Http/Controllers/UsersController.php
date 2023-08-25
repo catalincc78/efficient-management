@@ -31,6 +31,16 @@ class UsersController extends Controller
                 'field_slug' => 'email',
                 'field_type' => 'email'
             ],
+            [
+                'field_label' => 'Password',
+                'field_slug' => 'password',
+                'field_type' => 'password'
+            ],
+            [
+                'field_label' => 'Confirm Password',
+                'field_slug' => 'password_confirmation',
+                'field_type' => 'password'
+            ],
         ];
 
         if ($user->type === 'company') {
@@ -56,5 +66,9 @@ class UsersController extends Controller
             ]);
         }
         return view('profile', ['user' => $user, 'arFields' => $arFields]);
+    }
+
+    public static function editProfile(){
+
     }
 }

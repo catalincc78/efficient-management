@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -39,10 +40,13 @@ class RegisterController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest');
+        if(Route::getCurrentRoute()->uri() !== 'profile') {
+            $this->middleware('guest');
+        }
+
     }
 
-    public function showRegistrationForm()
+    public static function showRegistrationForm()
     {
         $arFields = [
             [
@@ -60,6 +64,7 @@ class RegisterController extends Controller
                 'field_slug' => 'email',
                 'field_type' => 'email'
             ],
+
             [
                 'field_label' => 'Category',
                 'field_slug' => 'type',
@@ -110,14 +115,15 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        $isEdit = auth()->check();
         $rules = [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'type' => ['required', Rule::in(['personal', 'company'])]
+            'type' => [$isEdit ? 'nullable' : 'required', Rule::in(['personal', 'company'])]
         ];
-        if($data['type'] === 'company'){
+        if(($isEdit && auth()->user()->type === 'company') || (!$isEdit && $data['type'] === 'company')){
             $rules = array_merge($rules, [
                     'company_name' => ['required', 'string', 'max:255'],
                     'company_position' => ['required', 'string', 'max:255'],
@@ -136,7 +142,8 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $isEdit = auth()->check();
+        $data = [
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
@@ -145,6 +152,10 @@ class RegisterController extends Controller
             'cif' => $data['cif'],
             'type' => $data['type'],
             'password' => Hash::make($data['password']),
-        ]);
+        ];
+        if($isEdit){
+            unset($data['type']);
+        }
+        return $isEdit ? User::where('id', auth()->user()->id)->update($data) : User::create($data);
     }
 }

@@ -13,50 +13,35 @@
                                 {{ session('status') }}
                             </div>
                         @endif
-                        <div class="row my-2">
-                            <div class="col-md-6">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <a href="{{ route('product.main') }}" class="card-link card-link-no-underline">
-                                            <div class="card mb-4">
-                                                <div class="card-body bg-danger text-white text-center">
-                                                    <h5 class="card-title font-weight-bold">{{__('Add Product')}}</h5>
-                                                </div>
-                                            </div>
-                                        </a>
+                        <div class="row justify-content-between">
+                            <div class="col-md-4 mb-4">
+                                <a href="{{ route('product.main') }}" class="card-link card-link-no-underline">
+                                    <div class="card">
+                                        <div class="card-body d-flex flex-column text-center" style="height: 100%;">
+                                            <h5 class="card-title font-weight-bold">{{ __('Products') }}<br>{{ __('Management') }}</h5>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="row my-2">
-                                    <div class="col-md-12">
-                                        <a href="{{ route('transaction.main') }}" class="card-link card-link-no-underline">
-                                            <div class="card mb-4">
-                                                <div class="card-body bg-warning text-white text-center">
-                                                    <h5 class="card-title font-weight-bold">{{__('See Transactions')}}</h5>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="row my-2">
-                                    <div class="col-md-12">
-                                        <a href="{{ route('statistic.main') }}" class="card-link card-link-no-underline">
-                                            <div class="card mb-4">
-                                                <div class="card-body bg-primary text-white text-center">
-                                                    <h5 class="card-title font-weight-bold">{{__('Statistic Charts')}}</h5>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
+                                </a>
                             </div>
-                            <div class="col-md-6">
-                                <div class="card mb-4 bg-info text-white">
-                                    <div class="card-body text-right">
-                                        <h5 class="card-title">{{__('General Info')}}</h5>
-                                        <p>{{__('Total number of products: ')}}: {{$products->count()}}</p>
-                                        <p>{{__('Total number of transactions: ')}}: {{$transactions->count()}}</p>
+
+                            <div class="col-md-4 mb-4 d-md-block">
+                                <a href="{{ route('transaction.main') }}" class="card-link card-link-no-underline">
+                                    <div class="card">
+                                        <div class="card-body d-flex flex-column text-center" style="height: 100%;">
+                                            <h5 class="card-title font-weight-bold">{{ __('Transactions') }}<br>{{ __('Management') }}</h5>
+                                        </div>
                                     </div>
-                                </div>
+                                </a>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <a href="{{ route('statistic.main') }}" class="card-link card-link-no-underline">
+                                    <div class="card" style="height: 100%;">
+                                        <div class="card-body d-flex flex-column text-center" style="height: 100%;">
+                                            <h5 class="card-title font-weight-bold">{{ __('Statistics') }}</h5>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -72,10 +57,6 @@
         .card-link-no-underline {
             text-decoration: none !important;
             color: inherit;
-        }
-        .my-2 {
-            margin-top: 0.5rem !important;
-            margin-bottom: 0.5rem !important;
         }
     </style>
 @endsection

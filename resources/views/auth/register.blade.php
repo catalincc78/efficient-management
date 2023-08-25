@@ -1,5 +1,7 @@
 @extends('layouts.app')
-
+@php
+    $bIsEdit = auth()->check();
+@endphp
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -11,9 +13,12 @@
                     <form id="form-register" method="POST" action="{{ route('register') }}">
                         @csrf
                         @php
-                            $bIsCompany = old('type') === 'company';
+                            $bIsCompany = $bIsEdit ? auth()->user()->type === 'company' : (old('type') === 'company');
                         @endphp
                         @foreach($arFields as $field)
+                            @if($bIsEdit && $field['field_slug'] === 'type')
+                                @php continue; @endphp
+                            @endif
                             <div class="row mb-3{{(!$bIsCompany && ($field['company_only'] ?? false)) ? ' d-none' : '' }}">
                                 <label for="{{$field['field_slug']}}" class="col-md-4 col-form-label text-md-end">{{ __($field['field_label']) }}</label>
 
@@ -26,7 +31,7 @@
                                             </div>
                                         @endforeach
                                     @else
-                                        <input id="{{$field['field_slug']}}" type="{{$field['field_type']}}" class="form-control @error($field['field_slug']) is-invalid @enderror" name="{{$field['field_slug']}}" value="{{ old($field['field_slug']) }}" autocomplete="{{$field['field_label']}}" >
+                                        <input id="{{$field['field_slug']}}" type="{{$field['field_type']}}" class="form-control @error($field['field_slug']) is-invalid @enderror" name="{{$field['field_slug']}}" value="{{ $field['field_slug'] === 'password' ? '' : ($bIsEdit ? auth()->user()->{$field['field_slug']} : old($field['field_slug'])) }}" autocomplete="{{$field['field_label']}}" >
                                     @endif
                                     @error($field['field_slug'])
                                     <span class="invalid-feedback" role="alert">
