@@ -19,8 +19,8 @@ class TransactionSeeder extends Seeder
         $faker = Faker::create('en_US');
         $faker->locale('en_US');
         $userId = 1;
-        $startDate = Carbon::create(2023, 7, 18);
-        $endDate = Carbon::create(2023, 8, 24);
+        $startDate = Carbon::create(2023, 8, 1);
+        $endDate = Carbon::create(2023, 8, 30);
 
         $companyActivities = [
             'Organize Book Sale Event',
@@ -84,14 +84,13 @@ class TransactionSeeder extends Seeder
             'Library Escape Room Challenge',
         ];
 
-
         foreach (range(1, 80) as $index) {
             $createdAt = $faker->dateTimeBetween($startDate, $endDate);
             $id = DB::table('transactions')->insertGetId(['user_id' => $userId, 'created_at' => $createdAt, 'updated_at' => $createdAt]);
             foreach (range(1, 6) as $index) {
                 $amountSign = (rand() % 2 === 0) ? 1 : -1;
                 $target_type =  rand(0,1) > 0.5 ? 'product' : 'activity';
-                $amount = rand(100, 9000) * $amountSign;
+                $amount = ($amountSign > 0 ? rand(3000, 7000) : rand(1000, 5000))* $amountSign;
                 if($target_type === 'product') {
                     $product_id = Products::all()->random(1)->first()->id;
                     $quantity = rand(0,30) * (-1 * $amountSign);

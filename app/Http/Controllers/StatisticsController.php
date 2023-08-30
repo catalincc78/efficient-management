@@ -136,34 +136,31 @@ class StatisticsController extends Controller
         }else{
             $averageValuesPerProduct = [(object)['sell' => 0, 'buy' => 0]];
         }
+
         $chartData = [
-            [
-                (object)[
-                    'label' => 'buy',
-                    'value' => abs($averageValuesGeneral->buy ?? 0),
-                    'color' => 'blue'
-                ],
-                (object)[
-                    'label' => 'profit',
-                    'value' => abs($averageValuesGeneral->sell ?? 0) - abs($averageValuesGeneral->buy ?? 0)
-                ]
-            ],
-            [
-                (object)[
-                    'label' => 'buy',
-                    'value' => abs($averageValuesPerProduct->buy ?? 0),
-                    'color' => 'blue'
-                ],
-                (object)[
-                    'label' => 'profit',
-                    'value' => abs($averageValuesPerProduct->sell ?? 0) - abs($averageValuesPerProduct->buy ?? 0)
-                ]
-            ]
+            self::generateDataSets($averageValuesGeneral),
+            self::generateDataSets($averageValuesPerProduct)
         ];
 
         return response()->json([
             'success' => 1,
             'chartData' => $chartData
         ]);
+    }
+
+    private static function generateDataSets($averageValues){
+        $profit = abs($averageValues->sell ?? 0) - abs($averageValues->buy ?? 0);
+        $datasetProfit =  (object)[
+            'label' => $profit > 0 ? 'profit' : 'loss',
+            'value' => abs($profit),
+            'color' => $profit > 0 ? 'green' : 'red'
+        ];
+        $datasetX = (object)[
+            'label' => $profit > 0 ? 'buy' : 'sell',
+            'value' => $profit > 0 ? abs($averageValues->buy ?? 0) : abs($averageValues->sell ?? 0) ,
+            'color' => $profit > 0 ? 'yellow' : 'blue'
+        ];
+
+        return $profit > 0 ? [$datasetProfit, $datasetX] : [$datasetX, $datasetProfit] ;
     }
 }

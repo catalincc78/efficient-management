@@ -52,34 +52,42 @@
             let labels = [];
             for(let index in chartData)
             {
-                if(index === '0'){
-                    labels = (chartData[index].map(entry => entry.label));
-                }
+                // if(index === '0'){
+                //     labels = (chartData[index].map(entry => entry.label));
+                // }
+                chartData[index].map(entry =>  labels.push(entry.label));
                 let colors = chartData[index].map(entry => entry.color ?? (entry.value >= 0 ? 'green' : 'red'));
                 datasets.push({ data: chartData[index].map(entry => entry.value), backgroundColor: colors });
             }
             let graph = $(selector).data('graph');
             if(graph) {
-                graph.data.labels = labels;
-                graph.data.datasets = datasets;
-                graph.update();
-            }else {
-                graph =  new Chart(ctx, {
-                    type: oChart['graph_type'],
-                    data: {
-                        labels: labels[0],
-                        datasets: datasets
-                    },
-                    options: {
-                        plugins: {
-                            legend: false
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                    }
-                });
-                $(selector).data('graph', graph);
+                graph.destroy();
             }
+            graph =  new Chart(ctx, {
+                type: oChart['graph_type'],
+                data: datasets.length === 1 ? {
+                    datasets: datasets,
+                    labels: labels
+                } : {
+                    datasets: datasets
+                },
+                options: {
+                    plugins: {
+                        legend: false,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const labelIndex = (context.datasetIndex * 2) + context.dataIndex;
+                                    return (datasets.length > 1 ? labels[labelIndex] + ': ' : '') + context.formattedValue;
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+            $(selector).data('graph', graph);
         };
         let loadStatisticsChart = function (oChart) {
             let chartId = oChart['id'];
