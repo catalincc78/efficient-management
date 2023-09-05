@@ -135,16 +135,18 @@
                         $('#modal-product-add-or-edit .btn-close').click();
                     }else{
                         $('#modal-product-add-or-edit .form-control').removeClass('is-invalid');
-                        for(let fieldName in response.messages){
-                            $('#modal-product-add-or-edit input[name="'+ fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
-                            $('#modal-product-add-or-edit .form-control').addClass('is-invalid');
+                        if(response.errors === 1) {
+                            showNotification('.products-modal-notifications', response.messages, 'danger');
+                        }else {
+                            for (let fieldName in response.messages) {
+                                $('#modal-product-add-or-edit input[name="' + fieldName + '"]').addClass('is-invalid');
+                                $('#modal-product-add-or-edit input[name="' + fieldName + '"]').closest('div').find('.invalid-feedback').html(response.messages[fieldName]);
+                            }
                         }
                     }
                 }
             });
         })
-
-
 
         $(document).ready(function() {
             loadProductList();

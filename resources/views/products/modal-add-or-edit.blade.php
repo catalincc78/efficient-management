@@ -7,6 +7,9 @@
                 <h1 class="modal-title fs-5" id="product-add-or-edit-title">{{ __('Product Info') }}</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <div class="products-modal-notifications">
+                {{-- Loaded with AJAX --}}
+            </div>
             <div class="modal-body">
                 <form>
                     @csrf
