@@ -53,9 +53,10 @@
 @section('scripts')
     @parent
     <script type="module">
-
+        // Variabilele globale utilizate pentru paginarea și detaliile tranzacțiilor
         var nTransactionsCurrentPage = 1;
         var openedTransactionDetails;
+        // Funcția care încarcă lista de tranzacții
         var loadTransactionList = function(html = undefined) {
             if(html !== undefined){
                 $('.transactions-list').html(html);
@@ -81,6 +82,7 @@
             });
         }
 
+        // Eveniment pentru paginare - schimbarea paginii tranzacțiilor
         $(document).on('click', '.transactions-list .page-item a.page-link', function(evt) {
             evt.preventDefault();
 
@@ -92,7 +94,7 @@
             }
         });
 
-        // Show Add or Edit Transaction modal
+        // Eveniment pentru afișarea modalului de adăugare/editare tranzacție
         $(document).on('click', '.btn-transaction-add, .btn-transaction-edit', function(evt){
             let modalSelector = $('#modal-transaction-add-or-edit');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -121,9 +123,8 @@
                 modal.show();
             }
         });
-        // End of Show Add or Edit Transaction modal
 
-        // Manage Items Row
+        // Eveniment pentru adăugarea unui element în modalul de adăugare/editare tranzacție
         $(document).on('click', '#modal-transaction-add-or-edit .btn-add-item', function() {
             let modalSelector = $('#modal-transaction-add-or-edit');
             let itemsContainer = modalSelector.find('.mtae-transacted-items-container');
@@ -132,26 +133,25 @@
             itemPlaceholderClone.removeClass('placeholder-item');
             itemsContainer.append(itemPlaceholderClone);
         });
-
+        // Eveniment pentru a schimba tipul(produs/activitate) în modalul de adăugare/editare tranzacție
         $(document).on('click', '#modal-transaction-add-or-edit .btn-transacted-item-toggle-type', function(evt) {
             let item = $(evt.currentTarget).closest('.transacted-item-row');
             item.toggleClass('transacted-item-type-activity').toggleClass('transacted-item-type-product');
             item.find('[name="target_type[]"]').val(item.hasClass('transacted-item-type-activity' ) ? 'activity' : 'product') ;
         });
-
+        // Eveniment pentru a schimba semnul cantității în modalul de adăugare/editare tranzacție
         $(document).on('click', '#modal-transaction-add-or-edit .btn-transacted-item-toggle-amount-sign', function(evt) {
             let item = $(evt.currentTarget).closest('.transacted-item-row');
             item.toggleClass('transacted-item-amount-positive').toggleClass('transacted-item-amount-negative');
             item.find('[name="is_amount_positive[]"]').val(item.hasClass('transacted-item-amount-positive' ) ? 1 : 0) ;
         });
-
+        // Eveniment pentru ștergerea unui element în modalitatea de adăugare/editare tranzacție
         $(document).on('click', '#modal-transaction-add-or-edit .btn-transacted-item-delete', function(evt) {
             let item = $(evt.currentTarget).closest('.transacted-item-row');
             item.remove();
         });
-        // End of Manage Items Row
 
-        // Show Details Transaction Modal
+        // Eveniment pentru afișarea detaliilor unei tranzacții
         $(document).on('click', '.btn-transaction-details', function(evt){
             let btn = $(evt.currentTarget);
             let transaction = btn.closest('.transaction');
@@ -162,9 +162,8 @@
                 details.show();
             }
         });
-        // End Of Show Details Transaction Modal
 
-        // Save transaction
+        // Eveniment pentru salvarea tranzacției
         $(document).on('click', '#modal-transaction-add-or-edit .btn-save', function(){
             let data = $('#modal-transaction-add-or-edit form').serialize();
             data += '&page=' + nTransactionsCurrentPage;
@@ -194,7 +193,7 @@
             });
         })
 
-        // Delete Transaction
+        // Eveniment pentru ștergerea unei tranzacții
         $(document).on('click', '.btn-transaction-delete', function(evt){
             let modalSelector = $('#modal-transaction-delete');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -225,9 +224,8 @@
                 }
             });
         });
-        // End Of Delete Transaction
 
-        // Filters
+        // Evenimente pentru filtre
         createDatePicker('#filter_date_start', loadTransactionList);
         createDatePicker('#filter_date_end', loadTransactionList);
 
@@ -235,6 +233,7 @@
             loadTransactionList();
         });
 
+        // Inițializarea încărcării listei de tranzacții la încărcarea paginii
         $(document).ready(function() {
             loadTransactionList();
         });

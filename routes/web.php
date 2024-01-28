@@ -20,9 +20,7 @@ Auth::routes();
 Route::get('/profile', 'Auth\RegisterController@showRegistrationForm')->name('profile');
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
     Route::get('/products', 'ProductsController@main')->name('product.main');
-
     Route::prefix('product')->group(function () {
         Route::get('/', 'ProductsController@list')->name('product.list');
         Route::get('/{id}', 'ProductsController@get')->name('product.get');
@@ -32,7 +30,6 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/transactions', 'TransactionsController@main')->name('transaction.main');
-
     Route::prefix('transaction')->group(function () {
         Route::get('/', 'TransactionsController@list')->name('transaction.list');
         Route::get('/{id}', 'TransactionsController@get')->name('transaction.get');
@@ -43,7 +40,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/statistics', 'StatisticsController@main')->name('statistic.main');
     Route::get('/validate-vat', 'StatisticsController@validateVAT')->name('statistic.check-vat');
-
     Route::prefix('statistic')->group(function () {
         Route::get('/chart-daily-amount', 'StatisticsController@chartDailyAmount')->name('statistic.chart.daily-amount');
         Route::get('/chart-daily-stock', 'StatisticsController@chartDailyStock')->name('statistic.chart.daily-stock');

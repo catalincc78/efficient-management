@@ -1,4 +1,5 @@
 <script type="module">
+    // Funcție pentru afișarea notificărilor într-un container specific
      window.showNotification = function(containerSelector, arMessages, type = 'success'){
         $(containerSelector).html('<div class="alert alert-' + type +'" role="alert">' + arMessages.join('<br>') + '</div>');
         setTimeout(function(){
@@ -6,6 +7,7 @@
         },3000);
     }
 
+    // Funcție pentru setarea unui filtru de intrare pentru un element de intrare
      window.setInputFilter = function(textbox, inputFilter, errMsg) {
          [ "input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop", "focusout" ].forEach(function(event) {
              $(document).on(event, textbox, function(e) {
@@ -30,13 +32,18 @@
              });
          });
      }
+
+     // Setarea unui filtru pentru intrările cu numere cu virgulă
      setInputFilter('.input-type-float', function(value) {
          return /^\d*\.?\d*$/.test(value);
      }, '{{ __('Type only digits and floating point!') }}');
+
+     // Setarea unui filtru pentru intrările cu numere întregi
      setInputFilter('.input-type-int', function(value) {
          return /^\d*$/.test(value);
      }, '{{ __('Type only digits!') }}');
 
+     // Funcție pentru crearea unui selector de date
      window.createDatePicker =  function(pickerSelector, onChangeCallback = null, minDate = null, maxDate = null) {
          let bIsStart = pickerSelector.includes('start');
          let arSplitSelector = bIsStart ? pickerSelector.split('start') : pickerSelector.split('end');
@@ -44,15 +51,20 @@
          let reversePickerSelector = arSplitSelector[0] + (bIsStart ? 'end' : 'start') + sSuffix;
          let instanceSelector = bIsStart ? 'startDatePicker' + sSuffix : 'endDatePicker' + sSuffix;
          let currentDate = new Date();
+
+         // Distrugerea instanței de date existente, dacă există
          if (window[instanceSelector] !== undefined) {
              currentDate = window[instanceSelector].getDate();
              window[instanceSelector].destroy();
          }
+         // Setarea datei maxime sau minime în funcție de tipul de selector
          if (bIsStart) {
              maxDate = (maxDate === null) ? currentDate : maxDate;
          } else {
              minDate = (minDate === null) ? currentDate : minDate;
          }
+
+         // Crearea unui nou selector de date
          let currentPicker = new easepick.create({
              element: $(pickerSelector)[0],
              css: [

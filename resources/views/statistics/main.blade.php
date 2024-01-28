@@ -44,12 +44,16 @@
 @section('scripts')
     @parent
     <script type="module">
+        // Definirea variabilei 'arCharts' pentru stocarea datelor despre grafice
         let arCharts = {!! json_encode($charts) !!};
+
+        // Funcție pentru actualizarea graficului cu datele furnizate
         let updateChart = function (oChart, chartData) {
             let selector = '#chart_' + oChart['id'];
             let ctx = $(selector)[0].getContext('2d');
             let datasets = [];
             let labels = [];
+            // Construirea seturilor de date și etichetelor pentru grafic
             for(let index in chartData)
             {
                 // if(index === '0'){
@@ -59,6 +63,8 @@
                 let colors = chartData[index].map(entry => entry.color ?? (entry.value >= 0 ? 'green' : 'red'));
                 datasets.push({ data: chartData[index].map(entry => entry.value), backgroundColor: colors });
             }
+
+            // Distrugerea graficului existent și crearea unuia nou
             let graph = $(selector).data('graph');
             if(graph) {
                 graph.destroy();
@@ -89,6 +95,8 @@
             });
             $(selector).data('graph', graph);
         };
+
+        // Funcție pentru încărcarea datelor pentru un grafic specific
         let loadStatisticsChart = function (oChart) {
             let chartId = oChart['id'];
             let data = {
@@ -96,6 +104,7 @@
                 filter_date_end: $('#filter_date_end_' + chartId).val(),
                 filter_product: $('#filter_product_' + chartId).val()
             };
+            // Apelarea unei solicitări AJAX pentru obținerea datelor
             $.ajax({
                 type: "GET",
                 url: oChart['url'],
@@ -109,6 +118,8 @@
                 }
             });
         }
+
+        // Iterarea prin grafice și inițierea funcționalității pentru fiecare
         for(let i = 0; i < arCharts.length; i++){
             let oChart = arCharts[i];
             createDatePicker('#filter_date_start_' + oChart['id'], function(){loadStatisticsChart(oChart)});

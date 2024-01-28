@@ -28,8 +28,9 @@
 @section('scripts')
     @parent
     <script type="module">
-
+        // Variabile globale pentru gestionarea paginării produselor
         var nProductsCurrentPage = 1;
+        // Funcția pentru încărcarea listei de produse
         var loadProductList = function(html = undefined) {
             if(html !== undefined){
                 $('.products-list').html(html);
@@ -47,7 +48,7 @@
                 }
             });
         }
-
+        // Eveniment pentru paginare - schimbarea paginii produselor
         $(document).on('click', '.products-list .page-item a.page-link', function(evt) {
             evt.preventDefault();
 
@@ -59,7 +60,7 @@
             }
         });
 
-
+        // Eveniment pentru afișarea modalului de adăugare/editare produs
         $(document).on('click', '.btn-product-add, .btn-product-edit', function(evt){
             let modalSelector = $('#modal-product-add-or-edit');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -88,6 +89,7 @@
             }
         });
 
+        // Eveniment pentru ștergerea unui produs
         $(document).on('click', '.btn-product-delete', function(evt){
             let modalSelector = $('#modal-product-delete');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -97,6 +99,7 @@
             modal.show();
         });
 
+        // Eveniment pentru confirmarea ștergerii unui produs
         $(document).on('click', '#modal-product-delete .btn-danger', function(evt) {
             let modalSelector = $('#modal-product-delete');
             let modal = bootstrap.Modal.getOrCreateInstance(modalSelector);
@@ -119,6 +122,7 @@
             });
         });
 
+        // Eveniment pentru salvarea produsului
         $(document).on('click', '#modal-product-add-or-edit .btn-primary', function(){
             let data = $('#modal-product-add-or-edit form').serialize();
             data += '&page=' + nProductsCurrentPage;
@@ -148,6 +152,7 @@
             });
         })
 
+        // Inițializarea încărcării listei de produse la încărcarea paginii
         $(document).ready(function() {
             loadProductList();
         });

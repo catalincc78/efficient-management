@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionsController extends Controller
 {
+    // Afișează vizualizarea principală pentru tranzacții
     public static function main(){
         $products =  Products::where('user_id', auth()->user()->id)->where('active', 1)->orderBy('name')->get();
         return view('transactions.main', ['products' => $products]);
     }
+    // Preia tranzacțiile paginate și returnează un răspuns JSON
     public static function list(){
         $transactions = Helper::getPaginatedTransactions();
         return response()->json([
@@ -23,7 +25,7 @@ class TransactionsController extends Controller
             'html' => view('transactions.list', ['transactions' => $transactions])->render()
         ]);
     }
-
+    // Preia detaliile unei tranzacții specifice și returnează un răspuns JSON
     public static function get($id){
         $transaction = Transactions::with(['transacted_items'])
                         ->where('user_id', auth()->user()->id)
@@ -46,7 +48,7 @@ class TransactionsController extends Controller
             ]);
         }
     }
-
+    // Salvează sau actualizează o tranzacție pe baza datelor de intrare
     private static function saveTransaction($id = 0){
         $isEdit = !empty($id);
         $inputData = request()->input();
@@ -121,14 +123,15 @@ class TransactionsController extends Controller
             'messages' => ['Transaction ' . ($isEdit ? 'updated' : 'created') . ' successfully!'],
         ]);
     }
+    // Adaugă o tranzacție nouă
     public static function add(){
         return self::saveTransaction();
     }
-
+    // Editează o tranzacție existentă
     public static function edit($id){
         return self::saveTransaction($id);
     }
-
+    // Șterge o tranzacție
     public static function delete($id){
         Transactions::where('id', $id)->where('user_id', auth()->user()->id)->update(['active' => 0]);
         return response()->json([
